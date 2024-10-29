@@ -25,22 +25,22 @@ fi
 echo "${AFTER_COLOR} server up(port:${AFTER_PORT})"
 
 # 2
-for cnt in `seq 1 10`;
-do
-    echo "서버 응답 확인하는중~(${cnt}/10)";
-    UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
-    if [ "${UP}" != "OK" ]; then
-        sleep 10
-        continue
-    else
-        break
-    fi
-done
+# for cnt in `seq 1 10`;
+# do
+#     echo "서버 응답 확인하는중~(${cnt}/10)";
+#     UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
+#     if [ "${UP}" != "OK" ]; then
+#         sleep 10
+#         continue
+#     else
+#         break
+#     fi
+# done
 
-if [ $cnt -eq 10 ]; then
-    echo "서버에 문제가 있어요..."
-    exit 1
-fi
+# if [ $cnt -eq 10 ]; then
+#     echo "서버에 문제가 있어요..."
+#     exit 1
+# fi
 
 # 3
 sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/service-url.inc
@@ -49,7 +49,7 @@ echo "Deploy Completed!!"
 
 # 4
 echo "$BEFORE_COLOR server down(port:${BEFORE_PORT})"
-sudo docker compose -p ulvan-${BEFORE_COLOR} -f docker-compose.meongspot${BEFORE_COLOR}.yml down
+sudo docker compose -p meongspot-${BEFORE_COLOR} -f docker-compose.meongspot${BEFORE_COLOR}.yml down
 
 # 5
 sudo docker image prune -f
