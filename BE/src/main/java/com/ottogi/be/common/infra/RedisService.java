@@ -1,4 +1,4 @@
-package com.ottogi.be.common.service;
+package com.ottogi.be.common.infra;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
