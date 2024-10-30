@@ -1,5 +1,6 @@
 package com.ottogi.be.member.dto.request;
 
+import com.ottogi.be.member.domain.Member;
 import com.ottogi.be.member.domain.enums.Gender;
 import com.ottogi.be.member.validation.annotation.*;
 import lombok.AllArgsConstructor;
@@ -24,4 +25,17 @@ public class SignupRequest {
     @Phone
     private String phone;
     private Gender gender;
+    private String uuid;
+
+    public Member toEntity() {
+        return Member.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .nickname(nickname)
+                .birth(birth)
+                .phone(phone)
+                .gender(gender)
+                .build();
+    }
 }

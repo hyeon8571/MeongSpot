@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum AuthExceptionConstants implements ExceptionConstants {
 
+    PHONE_VERIFICATION_NOT_COMPLETED("AU001", "전화번호 인증 미실시", HttpStatus.BAD_REQUEST),
     PHONE_AUTH_CODE_MISMATCH("AU002", "전화번호 인증 실패", HttpStatus.BAD_REQUEST);
 
     final String code;

@@ -14,10 +14,11 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AuthPhoneService {
+public class PhoneAuthService {
 
     private final DefaultMessageService messageService;
     private final RedisService redisService;
@@ -50,15 +51,19 @@ public class AuthPhoneService {
         messageService.sendOne(new SingleMessageSendingRequest(message));
     }
 
-    public void verifyAuthCode(VerifyPhoneAuthCodeRequest request) {
+    public String verifyAuthCode(VerifyPhoneAuthCodeRequest request) {
         String issuedCode = (String) redisService.getData(RedisKeyConstants.PHONE_AUTH_CODE + request.getPhone());
 
-        if (!issuedCode.equals(request.getAuthCode())) {
+        if (issuedCode == null || !issuedCode.equals(request.getAuthCode())) {
             throw new PhoneVerificationFailedException();
         }
-        redisService.setData(RedisKeyConstants.PHONE_AUTH_VERIFIED + request.getPhone(), true, RedisExpiredTimeConstants.PHONE_AUTH_VERIFIED_EXPIRED);
-        redisService.deleteData(RedisKeyConstants.PHONE_AUTH_CODE + request.getPhone());
-    }
 
+        String uuid = UUID.randomUUID().toString();
+
+        redisService.setData(RedisKeyConstants.PHONE_AUTH_VERIFIED + request.getPhone(), uuid, RedisExpiredTimeConstants.PHONE_AUTH_VERIFIED_EXPIRED);
+        redisService.deleteData(RedisKeyConstants.PHONE_AUTH_CODE + request.getPhone());
+
+        return uuid;
+    }
 
 }

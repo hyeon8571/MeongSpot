@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 public class SendPhoneAuthCodeRequest {
     @Phone
     private String phone;
-    private String loginId;
 }
