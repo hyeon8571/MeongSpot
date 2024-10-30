@@ -1,6 +1,5 @@
 package com.ottogi.be.auth.filter;
 
-import com.ottogi.be.auth.exception.RefreshVerificationFailedException;
 import com.ottogi.be.auth.util.JwtUtil;
 import com.ottogi.be.auth.util.ResponseUtil;
 import com.ottogi.be.common.constants.RedisFieldConstants;
@@ -56,19 +55,22 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         if (refreshToken == null) {
-            throw new RefreshVerificationFailedException();
+            ResponseUtil.setResponse(response, "AU005", "리프레시 토큰 인증 실패", HttpStatus.UNAUTHORIZED);
+            return;
         }
 
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new RefreshVerificationFailedException();
+            ResponseUtil.setResponse(response, "AU005", "리프레시 토큰 인증 실패", HttpStatus.UNAUTHORIZED);
+            return;
         }
 
         String loginId = jwtUtil.getLoginId(refreshToken);
 
         if (redisService.getHashData(generatePrefixedKey(loginId), RedisFieldConstants.REFRESH_TOKEN) == null) {
-            throw new RefreshVerificationFailedException();
+            ResponseUtil.setResponse(response, "AU005", "리프레시 토큰 인증 실패", HttpStatus.UNAUTHORIZED);
+            return;
         }
 
         redisService.deleteData(generatePrefixedKey(loginId));

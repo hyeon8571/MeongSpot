@@ -6,6 +6,7 @@ import com.ottogi.be.common.infra.RedisService;
 import com.ottogi.be.member.dto.request.SignupRequest;
 import com.ottogi.be.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ public class SignupService {
     private final MemberRepository memberRepository;
     private final RedisService redisService;
     private final CheckInfoService checkInfoService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public void signup(SignupRequest request) {
@@ -28,7 +30,9 @@ public class SignupService {
         checkInfoService.checkId(request.getLoginId());
         checkInfoService.checkNickname(request.getNickname());
 
-        memberRepository.save(request.toEntity());
+        String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
+
+        memberRepository.save(request.toEntity(encodedPassword));
         redisService.deleteData(RedisKeyConstants.PHONE_AUTH_VERIFIED + request.getPhone());
     }
 }
