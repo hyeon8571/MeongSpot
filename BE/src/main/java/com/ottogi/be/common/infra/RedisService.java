@@ -16,12 +16,17 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.MILLISECONDS);
     }
 
-    public boolean existData(String key) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-    }
-
     public Object getData(String key) {
         return redisTemplate.opsForValue().get(key);
+    }
+
+    public void setHashData(String key, String field, Object value, Long expiredTime) {
+        redisTemplate.opsForHash().put(key, field, value);
+        redisTemplate.expire(key, expiredTime, TimeUnit.MILLISECONDS);
+    }
+
+    public Object getHashData(String key, String field) {
+        return redisTemplate.opsForHash().get(key, field);
     }
 
     public void deleteData(String key) {

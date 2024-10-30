@@ -2,8 +2,12 @@ package com.ottogi.be.auth.controller;
 
 import com.ottogi.be.auth.dto.request.SendPhoneAuthCodeRequest;
 import com.ottogi.be.auth.dto.request.VerifyPhoneAuthCodeRequest;
+import com.ottogi.be.auth.service.JwtService;
 import com.ottogi.be.auth.service.PhoneAuthService;
+import com.ottogi.be.auth.util.JwtUtil;
 import com.ottogi.be.common.dto.response.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final PhoneAuthService phoneAuthService;
+    private final JwtService jwtService;
 
     @PostMapping("/phone/send-auth-code")
     public ResponseEntity<?> authCodeSend(@Valid @RequestBody SendPhoneAuthCodeRequest request) {
@@ -29,5 +34,11 @@ public class AuthController {
     public ResponseEntity<?> authCodeVerify(@Valid @RequestBody VerifyPhoneAuthCodeRequest request) {
         String uuid = phoneAuthService.verifyAuthCode(request);
         return ResponseEntity.ok(new ApiResponse<>("AU102", "전화번호 인증 성공", uuid));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> accessReissue(HttpServletRequest request, HttpServletResponse response) {
+        jwtService.reissueAccess(request, response);
+        return ResponseEntity.ok(new ApiResponse<>("AU103", "엑세스 토큰 재발급 성공", null));
     }
 }

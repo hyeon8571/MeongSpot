@@ -27,10 +27,10 @@ public class SignupRequest {
     private Gender gender;
     private String uuid;
 
-    public Member toEntity() {
+    public Member toEntity(String encodedPassword) {
         return Member.builder()
                 .loginId(loginId)
-                .password(password)
+                .password(encodedPassword)
                 .name(name)
                 .nickname(nickname)
                 .birth(birth)
