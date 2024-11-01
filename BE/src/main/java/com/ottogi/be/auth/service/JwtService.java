@@ -28,17 +28,7 @@ public class JwtService {
     }
 
     public void reissueAccess(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = null;
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("refresh")) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String refreshToken = getRefreshTokenFromCookies(request);
 
         if (refreshToken == null) {
             throw new RefreshVerificationFailedException();
@@ -52,7 +42,9 @@ public class JwtService {
 
         String loginId = jwtUtil.getLoginId(refreshToken);
 
-        if (redisService.getHashData(generatePrefixedKey(loginId), RedisFieldConstants.REFRESH_TOKEN) == null) {
+        String savedRefresh = (String) redisService.getHashData(generatePrefixedKey(loginId), RedisFieldConstants.REFRESH_TOKEN);
+
+        if (savedRefresh == null || !savedRefresh.equals(refreshToken)) {
             throw new RefreshVerificationFailedException();
         }
 
@@ -63,7 +55,7 @@ public class JwtService {
 
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .loginId(loginId)
-                .refreshToken(refreshToken)
+                .refreshToken(newRefresh)
                 .build();
 
         saveRefreshToken(newRefreshToken);
@@ -74,5 +66,16 @@ public class JwtService {
 
     private String generatePrefixedKey(String loginId) {
         return RedisKeyConstants.TOKEN + loginId;
+    }
+
+    private String getRefreshTokenFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refresh".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

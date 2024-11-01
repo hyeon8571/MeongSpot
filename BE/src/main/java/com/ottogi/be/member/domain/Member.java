@@ -51,9 +51,6 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(nullable = false)
-    private Boolean isOwner;
-
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -77,7 +74,6 @@ public class Member {
     @PrePersist
     protected void onCreate() {
         isWithdraw = false;
-        isOwner = false;
         role = Role.ROLE_USER;
     }
 
