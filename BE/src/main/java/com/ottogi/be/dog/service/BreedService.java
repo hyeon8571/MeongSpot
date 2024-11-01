@@ -22,4 +22,8 @@ public class BreedService {
                 .map(Breed::getName)
                 .collect(Collectors.toList());
     }
+
+    public List<String> findBreed(String keyword) {
+        return breedRepository.findBreedByKeyword(keyword);
+    }
 }
