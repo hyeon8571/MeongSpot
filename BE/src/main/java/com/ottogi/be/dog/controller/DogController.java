@@ -1,11 +1,16 @@
 package com.ottogi.be.dog.controller;
 
+import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
+import com.ottogi.be.dog.dto.request.DogAddRequest;
 import com.ottogi.be.dog.dto.response.PersonalityResponse;
 import com.ottogi.be.dog.service.BreedService;
+import com.ottogi.be.dog.service.DogService;
 import com.ottogi.be.dog.service.PersonalityService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +22,7 @@ public class DogController {
 
     private final BreedService breedService;
     private final PersonalityService personalityService;
+    private final DogService dogService;
 
     @GetMapping("/breed")
     public ResponseEntity<?> breedList() {
@@ -36,4 +42,10 @@ public class DogController {
         return ResponseEntity.ok(new ApiResponse<>("DO102", "성격 조회 성공", result));
     }
 
+    @PostMapping
+    public ResponseEntity<?> dogAdd(@Valid @ModelAttribute DogAddRequest dogAddRequest,
+                                    @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        dogService.addDog(dogAddRequest, loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("DO103", "반려견 등록 성공", null));
+    }
 }
