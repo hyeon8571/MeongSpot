@@ -19,12 +19,14 @@ public class SpotService {
     @Transactional
     public List<SpotResponse> findWalkingSpots(SpotDto dto){
         List<Spot> spots = spotRepository.findParksWithinRadius(dto.getLat(),dto.getLng(),dto.getRadius());
+        //meetingcount조회 to-do
 
         return spots.stream()
                 .map(spot -> SpotResponse.builder()
                         .meetingCnt(1)
                         .spotId(spot.getId())
-                        .location(spot.getLocation())
+                        .lat(spot.getLat())
+                        .lng(spot.getLng())
                         .name(spot.getName())
                         .build())
                 .collect(Collectors.toList());

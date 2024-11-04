@@ -13,9 +13,8 @@ import java.math.BigDecimal;
 public class SpotResponse {
     private int meetingCnt;
     private Long spotId;
-//    private BigDecimal lat;
-//    private BigDecimal lng;
-    private Point location;
+    private BigDecimal lat;
+    private BigDecimal lng;
     private String name;
 
 }

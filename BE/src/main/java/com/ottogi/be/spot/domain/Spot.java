@@ -18,11 +18,11 @@ public class Spot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 256)
-    private String address;
+    @Column(nullable = false, precision = 10, scale = 6)
+    private BigDecimal lat;
 
-    @Column(nullable = false)
-    private Point location;
+    @Column(nullable = false, precision = 10, scale = 6)
+    private BigDecimal lng;
 
     @Column(nullable = false, length = 32)
     private String name;
