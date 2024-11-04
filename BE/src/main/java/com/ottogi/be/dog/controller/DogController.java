@@ -9,10 +9,13 @@ import com.ottogi.be.dog.service.DogService;
 import com.ottogi.be.dog.service.PersonalityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -42,10 +45,10 @@ public class DogController {
         return ResponseEntity.ok(new ApiResponse<>("DO102", "성격 조회 성공", result));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> dogAdd(@Valid @ModelAttribute DogAddRequest dogAddRequest,
-                                    @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        dogService.addDog(dogAddRequest, loginMemberInfo.getLoginId());
-        return ResponseEntity.ok(new ApiResponse<>("DO103", "반려견 등록 성공", null));
+                                    @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws IOException {
+        dogService.addDog(dogAddRequest.toDto(loginMemberInfo.getLoginId()));
+        return new ResponseEntity<>(new ApiResponse<>("DO103", "반려견 등록 성공", null), HttpStatus.CREATED);
     }
 }

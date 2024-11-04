@@ -1,41 +1,35 @@
-package com.ottogi.be.dog.dto.request;
+package com.ottogi.be.dog.dto;
 
+import com.ottogi.be.dog.domain.Dog;
 import com.ottogi.be.dog.domain.enums.Gender;
 import com.ottogi.be.dog.domain.enums.Size;
-import com.ottogi.be.dog.dto.DogAddDto;
-import com.ottogi.be.dog.validation.annotation.Age;
-import com.ottogi.be.dog.validation.annotation.Name;
-import lombok.AllArgsConstructor;
+import com.ottogi.be.member.domain.Member;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Builder
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class DogAddRequest {
+public class DogAddDto {
     private MultipartFile profileImage;
-    @Name
     private String name;
     private String breed;
     private Size size;
-    @Age
     private int age;
     private Gender gender;
     private Boolean isNeuter;
     private LocalDate birth;
     private String introduction;
     private List<Long> personality;
+    private String loginId;
 
-    public DogAddDto toDto(String loginId) {
-        return DogAddDto.builder()
-                .loginId(loginId)
-                .profileImage(profileImage)
+    public Dog toEntity(String imagePath, Member member) {
+        return Dog.builder()
+                .member(member)
+                .profileImage(imagePath)
                 .name(name)
                 .breed(breed)
                 .size(size)
@@ -44,7 +38,6 @@ public class DogAddRequest {
                 .isNeuter(isNeuter)
                 .birth(birth)
                 .introduction(introduction)
-                .personality(personality)
                 .build();
     }
 }
