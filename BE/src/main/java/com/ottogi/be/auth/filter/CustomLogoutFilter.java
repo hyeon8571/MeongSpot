@@ -32,27 +32,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String requestURI = request.getRequestURI();
-        if (!requestURI.equals("/auth/logout")) {
+        if (!requestURI.equals("/auth/logout") || !request.getMethod().equals("POST")) {
             chain.doFilter(request, response);
             return;
         }
 
-        String requestMethod = request.getMethod();
-        if (!requestMethod.equals("POST")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        String refreshToken = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("refresh")) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String refreshToken = getRefreshTokenFromCookies(request);
 
         if (refreshToken == null) {
             ResponseUtil.setResponse(response, "AU005", "리프레시 토큰 인증 실패", HttpStatus.UNAUTHORIZED);
@@ -68,7 +53,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         String loginId = jwtUtil.getLoginId(refreshToken);
 
-        if (redisService.getHashData(generatePrefixedKey(loginId), RedisFieldConstants.REFRESH_TOKEN) == null) {
+        String savedRefresh = (String) redisService.getHashData(generatePrefixedKey(loginId), RedisFieldConstants.REFRESH_TOKEN);
+
+        if (savedRefresh == null || !savedRefresh.equals(refreshToken)) {
             ResponseUtil.setResponse(response, "AU005", "리프레시 토큰 인증 실패", HttpStatus.UNAUTHORIZED);
             return;
         }
@@ -86,6 +73,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private String generatePrefixedKey(String key) {
         return RedisKeyConstants.TOKEN + key;
+    }
+
+    private String getRefreshTokenFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refresh".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
 }
