@@ -5,6 +5,7 @@ import com.ottogi.be.dog.domain.Dog;
 import com.ottogi.be.dog.domain.DogPersonality;
 import com.ottogi.be.dog.domain.Personality;
 import com.ottogi.be.dog.dto.DogAddDto;
+import com.ottogi.be.dog.dto.response.DogListResponse;
 import com.ottogi.be.dog.exception.DogImageUploadException;
 import com.ottogi.be.dog.exception.DogPersonalityNotFoundException;
 import com.ottogi.be.dog.repository.DogPersonalityRepository;
@@ -58,5 +59,13 @@ public class DogService {
             pList.add(dogPersonality);
         }
         dogPersonalityRepository.saveAll(pList);
+        member.beOwner();
+    }
+
+    @Transactional(readOnly = true)
+    public List<DogListResponse> findDogList(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(MemberNotFoundException::new);
+        return dogRepository.findByMember(member);
     }
 }

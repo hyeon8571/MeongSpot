@@ -3,6 +3,7 @@ package com.ottogi.be.dog.controller;
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.dog.dto.request.DogAddRequest;
+import com.ottogi.be.dog.dto.response.DogListResponse;
 import com.ottogi.be.dog.dto.response.PersonalityResponse;
 import com.ottogi.be.dog.service.BreedService;
 import com.ottogi.be.dog.service.DogService;
@@ -51,4 +52,11 @@ public class DogController {
         dogService.addDog(dogAddRequest.toDto(loginMemberInfo.getLoginId()));
         return new ResponseEntity<>(new ApiResponse<>("DO103", "반려견 등록 성공", null), HttpStatus.CREATED);
     }
+
+    @GetMapping
+    public ResponseEntity<?> dogList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        List<DogListResponse> result = dogService.findDogList(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("DO104", "반려견 목록 조회 성공", result));
+    }
+
 }
