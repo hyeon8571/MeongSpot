@@ -11,8 +11,6 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 public class Dog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,4 +45,19 @@ public class Dog {
 
     @Column(length = 32, nullable = false)
     private String breed;
+
+    @Builder
+    public Dog(Member member, String profileImage, String name, String breed, Size size,
+               int age, Gender gender, boolean isNeuter, LocalDate birth, String introduction) {
+        this.member = member;
+        this.profileImage = profileImage;
+        this.name = name;
+        this.breed = breed;
+        this.size = size;
+        this.age = age;
+        this.gender = gender;
+        this.isNeuter = isNeuter;
+        this.birth = birth;
+        this.introduction = introduction;
+    }
 }
