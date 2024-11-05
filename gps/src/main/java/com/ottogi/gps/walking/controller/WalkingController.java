@@ -20,7 +20,7 @@ public class WalkingController {
     @PostMapping("/start")
     public ResponseEntity<?> walkingStart(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo,
                                           @RequestBody WalkingStartRequest request){
-        walkingService.startWalking(request);
+        walkingService.startWalking(request.toDto(loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("WK100", "산책 시작 성공",null));
     }
 
