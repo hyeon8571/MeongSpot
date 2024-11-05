@@ -66,6 +66,23 @@ public class DogService {
     public List<DogListResponse> findDogList(String loginId) {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(MemberNotFoundException::new);
-        return dogRepository.findByMember(member);
+        List<Dog> dogs = dogRepository.findByMember(member);
+        List<DogListResponse> result = new ArrayList<>();
+        for (Dog dog : dogs) {
+            List<String> personality = dogPersonalityRepository.findPersonalityByDog(dog);
+            DogListResponse dogListResponse = DogListResponse.builder()
+                    .name(dog.getName())
+                    .birth(dog.getBirth())
+                    .introduction(dog.getIntroduction())
+                    .gender(dog.getGender())
+                    .isNeuter(dog.getIsNeuter())
+                    .profileImage(dog.getProfileImage())
+                    .age(dog.getAge())
+                    .breed(dog.getBreed())
+                    .personality(personality)
+                    .build();
+            result.add(dogListResponse);
+        }
+        return result;
     }
 }
