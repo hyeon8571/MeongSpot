@@ -81,4 +81,8 @@ public class Member {
     protected void onDelete() {
         this.withdrawnAt = LocalDateTime.now();
     }
+
+    public void beOwner() {
+        this.role = Role.ROLE_OWNER;
+    }
 }
