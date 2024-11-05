@@ -6,8 +6,10 @@ import com.ottogi.be.spot.dto.SpotDto;
 import com.ottogi.be.spot.dto.response.SpotResponse;
 import com.ottogi.be.spot.service.SpotService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;

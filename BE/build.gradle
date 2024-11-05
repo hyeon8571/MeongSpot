@@ -44,7 +44,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
     // S3
-//    implementation 'org.springframework.cloud:spring-cloud-starter-aws:3.0.0'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     compileOnly 'org.projectlombok:lombok'
