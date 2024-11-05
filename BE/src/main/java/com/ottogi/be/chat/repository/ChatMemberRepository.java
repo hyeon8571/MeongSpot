@@ -27,10 +27,18 @@ public interface ChatMemberRepository extends JpaRepository<ChatMember, Long> {
     List<ChatMember> findAllChatFriendByLoginId(@Param("loginId") String loginId);
 
     @Query("""
+        SELECT cm
+        FROM ChatMember cm
+        WHERE cm.member.loginId = :loginId AND cm.chatRoom.chatRoomType = 'FRIEND'
+        ORDER BY cm.chatRoom.id ASC
+    """)
+    List<ChatMember> findAllFriendChatByLoginId(@Param("loginId") String loginId);
+
+    @Query("""
         SELECT cm1.chatRoom
         FROM ChatMember cm1
         JOIN ChatMember cm2 ON cm1.chatRoom.id = cm2.chatRoom.id
-        WHERE cm1.member.id = :myId AND cm2.member.id = :friendId
+        WHERE cm1.member.id = :myId AND cm2.member.id = :friendId AND cm1.chatRoom.chatRoomType = 'FRIEND'
         ORDER BY cm1.chatRoom.id ASC
     """)
     Optional<ChatRoom> findChatRoomByMyIdAndFriendId(@Param("myId") Long myId, @Param("friendId") Long friendId);

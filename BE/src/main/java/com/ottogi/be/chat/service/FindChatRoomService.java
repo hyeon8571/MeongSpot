@@ -39,14 +39,16 @@ public class FindChatRoomService {
 
     @Transactional(readOnly = true)
     public List<FriendChatRoomResponse> findFriendChatRoomList(String loginId) {
-        List<ChatMember> myFriendChatList = chatMemberRepository.findAllChatFriendByLoginId(loginId);
+        List<ChatMember> myFriendInfos = chatMemberRepository.findAllChatFriendByLoginId(loginId);
+        List<ChatMember> myFriendChatList = chatMemberRepository.findAllFriendChatByLoginId(loginId);
 
         List<FriendChatRoomResponse> result= new ArrayList<>();
 
-        for (ChatMember chatMember : myFriendChatList) {
+        for (int i = 0; i < myFriendInfos.size(); i++) {
+            ChatMember chatMember = myFriendInfos.get(i);
             Long chatRoomId = chatMember.getChatRoom().getId();
             ChatMessage lastMessage = chatMessageRepository.findFirstByChatRoomIdOrderBySentAtDesc(chatRoomId);
-            LocalDateTime leftAt = chatMember.getLeftAt();
+            LocalDateTime leftAt = myFriendChatList.get(i).getLeftAt();
 
             if (lastMessage != null && (leftAt == null || lastMessage.getSentAt().isAfter(leftAt))) {
                 FriendChatRoomResponse response = FriendChatRoomResponse.builder()
