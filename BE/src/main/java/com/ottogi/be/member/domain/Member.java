@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -48,6 +50,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(nullable = false, length = 256)
+    private String profileImage;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -75,10 +80,24 @@ public class Member {
     protected void onCreate() {
         isWithdraw = false;
         role = Role.ROLE_USER;
+        profileImage = null;
     }
 
     @PreRemove
     protected void onDelete() {
         this.withdrawnAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Member member = (Member) o;
+        return Objects.equals(id, member.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
