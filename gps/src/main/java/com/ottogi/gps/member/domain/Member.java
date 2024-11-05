@@ -1,7 +1,7 @@
-package com.ottogi.be.member.domain;
+package com.ottogi.gps.member.domain;
 
-import com.ottogi.be.member.domain.enums.Gender;
-import com.ottogi.be.member.domain.enums.Role;
+import com.ottogi.gps.member.domain.enums.Gender;
+import com.ottogi.gps.member.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -80,9 +80,5 @@ public class Member {
     @PreRemove
     protected void onDelete() {
         this.withdrawnAt = LocalDateTime.now();
-    }
-
-    public void beOwner() {
-        this.role = Role.ROLE_OWNER;
     }
 }
