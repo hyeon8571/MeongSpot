@@ -32,9 +32,12 @@ public class WalkingLog {
     @Column(name = "started_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "finished_at")
+    @Column(name = "finished_at",nullable = false)
     private LocalDateTime finishedAt;
 
-    @Column
-    private Float distance;
+    @Column(nullable = false)
+    private double distance;
+
+    @Column(columnDefinition = "LONGTEXT",nullable = false)
+    private String trail;
 }
