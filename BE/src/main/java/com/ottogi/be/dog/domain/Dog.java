@@ -29,6 +29,7 @@ public class Dog {
     private String introduction;
 
     @Column(length = 6, nullable = false)
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(nullable = false)
@@ -38,6 +39,7 @@ public class Dog {
     private String profileImage;
 
     @Column(length = 6, nullable = false)
+    @Enumerated(EnumType.STRING)
     private Size size;
 
     @Column(nullable = false)
@@ -50,6 +52,18 @@ public class Dog {
     public Dog(Member member, String profileImage, String name, String breed, Size size,
                int age, Gender gender, boolean isNeuter, LocalDate birth, String introduction) {
         this.member = member;
+        this.profileImage = profileImage;
+        this.name = name;
+        this.breed = breed;
+        this.size = size;
+        this.age = age;
+        this.gender = gender;
+        this.isNeuter = isNeuter;
+        this.birth = birth;
+        this.introduction = introduction;
+    }
+
+    public void updateInformation(String profileImage, String name, String breed, Size size, int age, Gender gender, Boolean isNeuter, LocalDate birth, String introduction) {
         this.profileImage = profileImage;
         this.name = name;
         this.breed = breed;

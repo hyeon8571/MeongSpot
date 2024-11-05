@@ -5,8 +5,11 @@ import com.ottogi.be.dog.domain.Dog;
 import com.ottogi.be.dog.domain.DogPersonality;
 import com.ottogi.be.dog.domain.Personality;
 import com.ottogi.be.dog.dto.DogAddDto;
+import com.ottogi.be.dog.dto.DogModifyDto;
 import com.ottogi.be.dog.dto.response.DogListResponse;
 import com.ottogi.be.dog.exception.DogImageUploadException;
+import com.ottogi.be.dog.exception.DogNotFoundException;
+import com.ottogi.be.dog.exception.DogOwnerMismatchException;
 import com.ottogi.be.dog.exception.DogPersonalityNotFoundException;
 import com.ottogi.be.dog.repository.DogPersonalityRepository;
 import com.ottogi.be.dog.repository.DogRepository;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +75,7 @@ public class DogService {
         for (Dog dog : dogs) {
             List<String> personality = dogPersonalityRepository.findPersonalityByDog(dog);
             DogListResponse dogListResponse = DogListResponse.builder()
+                    .id(dog.getId())
                     .name(dog.getName())
                     .birth(dog.getBirth())
                     .introduction(dog.getIntroduction())
@@ -85,4 +90,46 @@ public class DogService {
         }
         return result;
     }
+
+    @Transactional
+    public void modifyDog(DogModifyDto dogModifyDto) throws URISyntaxException, IOException {
+        Member member = memberRepository.findByLoginId(dogModifyDto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+        Dog dog = dogRepository.findById(dogModifyDto.getDogId())
+                .orElseThrow(DogNotFoundException::new);
+
+        if (!dog.getMember().equals(member)) throw new DogOwnerMismatchException();
+
+        String imagePath = null;
+        if (dogModifyDto.getProfileImage().isEmpty() || dogModifyDto.getProfileImage() == null) {
+            imagePath = dog.getProfileImage();
+        } else {
+            awsS3Service.deleteFile(dog.getProfileImage());
+            imagePath = awsS3Service.uploadFile(dogModifyDto.getProfileImage());
+        }
+
+        dog.updateInformation(
+                imagePath, dogModifyDto.getName(), dogModifyDto.getBreed(), dogModifyDto.getSize(),
+                dogModifyDto.getAge(), dogModifyDto.getGender(), dogModifyDto.getIsNeuter(), dogModifyDto.getBirth(), dogModifyDto.getIntroduction()
+        );
+
+        dogPersonalityRepository.deleteByDog(dog);
+
+        List<Long> personalityList = dogModifyDto.getPersonality();
+        if (personalityList == null || personalityList.isEmpty()) throw new DogPersonalityNotFoundException();
+        List<DogPersonality> pList = new ArrayList<>();
+        for (Long p : personalityList) {
+            Personality personality = personalityRepository.findById(p)
+                    .orElseThrow(DogPersonalityNotFoundException::new);
+
+            DogPersonality dogPersonality = DogPersonality.builder()
+                    .dog(dog)
+                    .personality(personality)
+                    .build();
+
+            pList.add(dogPersonality);
+        }
+        dogPersonalityRepository.saveAll(pList);
+    }
+
 }

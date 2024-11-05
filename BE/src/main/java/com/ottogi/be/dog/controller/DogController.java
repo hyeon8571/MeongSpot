@@ -3,6 +3,7 @@ package com.ottogi.be.dog.controller;
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.dog.dto.request.DogAddRequest;
+import com.ottogi.be.dog.dto.request.DogModifyRequest;
 import com.ottogi.be.dog.dto.response.DogListResponse;
 import com.ottogi.be.dog.dto.response.PersonalityResponse;
 import com.ottogi.be.dog.service.BreedService;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -59,4 +61,11 @@ public class DogController {
         return ResponseEntity.ok(new ApiResponse<>("DO104", "반려견 목록 조회 성공", result));
     }
 
+    @PutMapping("/{dogId}")
+    public ResponseEntity<?> dogModify(@Valid @ModelAttribute DogModifyRequest dogModifyRequest,
+                                       @PathVariable Long dogId,
+                                       @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws URISyntaxException, IOException {
+        dogService.modifyDog(dogModifyRequest.toDto(loginMemberInfo.getLoginId(), dogId));
+        return ResponseEntity.ok(new ApiResponse<>("DO105", "반려견 정보 수정 성공", null));
+    }
 }

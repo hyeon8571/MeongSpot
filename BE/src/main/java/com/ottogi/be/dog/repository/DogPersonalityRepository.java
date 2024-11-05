@@ -15,4 +15,6 @@ public interface DogPersonalityRepository extends JpaRepository<DogPersonality, 
             WHERE dp.dog = :dog
             """)
     List<String> findPersonalityByDog(Dog dog);
+
+    void deleteByDog(Dog dog);
 }

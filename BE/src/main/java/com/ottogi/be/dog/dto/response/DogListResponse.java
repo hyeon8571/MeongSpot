@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class DogListResponse {
+    private Long id;
     private String name;
     private LocalDate birth;
     private String introduction;
