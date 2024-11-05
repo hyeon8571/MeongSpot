@@ -1,21 +1,27 @@
-package com.ottogi.be.spot.domain;
+package com.ottogi.be.walkingLog.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "meeting_spot")
+@Table(name = "walking_location")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Spot {
+public class WalkingLocation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "walking_log_id", nullable = false)
+    private WalkingLocation walkingLocation;
 
     @Column(nullable = false, precision = 10, scale = 6)
     private BigDecimal lat;
@@ -23,6 +29,8 @@ public class Spot {
     @Column(nullable = false, precision = 10, scale = 6)
     private BigDecimal lng;
 
-    @Column(nullable = false, length = 32)
-    private String name;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime time;
+
 }
