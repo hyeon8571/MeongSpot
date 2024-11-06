@@ -65,7 +65,7 @@ public class RabbitConfig {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setHost(rabbitHost);
         connectionFactory.setPort(rabbitPort);
-        connectionFactory.setUsername(rabbitHost);
+        connectionFactory.setUsername(rabbitUser);
         connectionFactory.setPassword(rabbitPassword);
         return connectionFactory;
     }
