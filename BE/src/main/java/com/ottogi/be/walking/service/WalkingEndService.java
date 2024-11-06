@@ -1,5 +1,8 @@
 package com.ottogi.be.walking.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ottogi.be.dog.domain.Dog;
 import com.ottogi.be.dog.repository.DogRepository;
 import com.ottogi.be.member.domain.Member;
@@ -27,30 +30,36 @@ public class WalkingEndService {
     private final WalkingRedisRepository walkingRedisRepository;
     private final WalkingLogRepository walkingLogRepository;
     private final DogRepository dogRepository;
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Transactional
-    public void endWalking(String loginId) {
+    public void endWalking(String loginId) throws JsonProcessingException {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(MemberNotFoundException::new);
 
         Long userId = member.getId();
-        List<Object> gpsCoordinates = walkingRedisRepository.getGpsData(userId);
-        List<Object> dogIds = walkingRedisRepository.getDogIds(userId);
-        Long startTimeEpoch = walkingRedisRepository.getStartTime(userId);
-        Long endTimeEpoch = Instant.now().getEpochSecond();
 
+        List<Object> gpsCoordinates = walkingRedisRepository.getGpsData(userId);
+        List<PointDto> latLngList = parseGpsCoordinates(gpsCoordinates);
+        List<Object> dogIds = walkingRedisRepository.getDogIds(userId);
+        List<Long> parsedDogIds = parseDogIds(dogIds);
+
+        Long startTimeEpoch = walkingRedisRepository.getStartTime(userId);
         LocalDateTime startDateTime = Instant.ofEpochSecond(startTimeEpoch)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
+
+        Long endTimeEpoch = Instant.now().getEpochSecond();
         LocalDateTime endDateTime = Instant.ofEpochSecond(endTimeEpoch)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
-        String trail = encodePolyline(gpsCoordinates);
-        double distance = calculateDistance(gpsCoordinates);
+        double distance = calculateDistance(latLngList);
+        String trail = encodePolyline(latLngList);
 
-        for (Object dogIdObj : dogIds) {
-            Long dogId = (Long) dogIdObj;
+
+        for (Long dogId : parsedDogIds) {
+            System.out.println(dogId);
             Dog dog = dogRepository.findById(dogId).orElseThrow(DogNotFoundException::new);
+
             WalkingLog walkingLog = WalkingLog.builder()
                     .member(member)
                     .dog(dog)
@@ -61,28 +70,17 @@ public class WalkingEndService {
                     .build();
             walkingLogRepository.save(walkingLog);
         }
-
+        
         walkingRedisRepository.deleteWalkingData(userId);
     }
 
-    private String encodePolyline(List<Object> gpsCoordinates) {
-        List<PointDto> latLngList = new ArrayList<>();
-
-        for (Object obj : gpsCoordinates) {
-
-            List<Double> coords = (List<Double>) obj;
-            double lat = coords.get(0);
-            double lng = coords.get(1);
-            latLngList.add(new PointDto(lat, lng));
-        }
-
+    private String encodePolyline(List<PointDto> latLngList){
         StringBuilder encoded = new StringBuilder();
         int prevLat = 0, prevLng = 0;
 
         for (PointDto point : latLngList) {
             int lat = (int) (point.getLat() * 1E6);
             int lng = (int) (point.getLng() * 1E6);
-
 
             int latDiff = lat - prevLat;
             encoded.append(encodeCoordinate(latDiff));
@@ -96,6 +94,20 @@ public class WalkingEndService {
         return encoded.toString();
     }
 
+    private List<PointDto> parseGpsCoordinates(List<Object> gpsCoordinates){
+        List<PointDto> latLngList = new ArrayList<>();
+
+        for (Object obj : gpsCoordinates) {
+            String coordStr = obj.toString().replace("\"", ""); // 따옴표 제거
+            String[] parts = coordStr.split(","); // 쉼표로 나누기
+            double lat = Double.parseDouble(parts[0]);
+            double lng = Double.parseDouble(parts[1]);
+            latLngList.add(new PointDto(lat, lng));
+        }
+
+        return latLngList;
+    }
+
     private String encodeCoordinate(int value) {
         value = value < 0 ? ~(value << 1) : (value << 1);
         StringBuilder encoded = new StringBuilder();
@@ -107,25 +119,38 @@ public class WalkingEndService {
         return encoded.toString();
     }
 
+    List<Long> parseDogIds(List<Object> dogIds) throws JsonProcessingException {
+        List<Long> parsedDogIds = new ArrayList<>();
+        for (Object dogIdObj : dogIds) {
 
-    private double calculateDistance(List<Object> gpsCoordinates) {
+            String jsonStr = dogIdObj.toString();
+            System.out.println("JSON String: " + jsonStr);
+            JsonNode rootNode = objectMapper.readTree(jsonStr);
+
+            for (JsonNode idNode : rootNode) {
+                parsedDogIds.add(idNode.asLong());
+            }
+        }
+        return parsedDogIds;
+    }
+
+    private double calculateDistance(List<PointDto> latLngList){
         double totalDistance = 0.0;
 
-        for (int i = 1; i < gpsCoordinates.size(); i++) {
-            List<Double> point1 = (List<Double>) gpsCoordinates.get(i - 1);
-            List<Double> point2 = (List<Double>) gpsCoordinates.get(i);
+        for (int i = 1; i < latLngList.size(); i++) {
+            PointDto point1 = latLngList.get(i - 1);
+            PointDto point2 = latLngList.get(i);
 
-            double lat1 = point1.get(0);
-            double lon1 = point1.get(1);
-            double lat2 = point2.get(0);
-            double lon2 = point2.get(1);
+            double lat1 = point1.getLat();
+            double lon1 = point1.getLng();
+            double lat2 = point2.getLat();
+            double lon2 = point2.getLng();
 
             totalDistance += haversine(lat1, lon1, lat2, lon2);
         }
 
         return totalDistance;
     }
-
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
         final double R = 6371;
@@ -137,5 +162,4 @@ public class WalkingEndService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
-
 }

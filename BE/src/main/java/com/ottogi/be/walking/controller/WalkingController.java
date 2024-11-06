@@ -1,5 +1,6 @@
 package com.ottogi.be.walking.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.walking.dto.request.WalkingStartRequest;
@@ -28,7 +29,7 @@ public class WalkingController {
     }
 
     @PostMapping("/end")
-    public ResponseEntity<?> walkingEnd(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+    public ResponseEntity<?> walkingEnd(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws JsonProcessingException {
         walkingEndService.endWalking(loginMemberInfo.getLoginId());
         return ResponseEntity.ok(new ApiResponse<>("WK102", "산책 종료 성공",null));
     }

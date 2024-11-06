@@ -16,6 +16,7 @@ public class WalkingStartRequest {
     public WalkingStartDto toDto(String loginId){
         return WalkingStartDto.builder()
                 .dogIds(this.dogIds)
+                .loginId(loginId)
                 .build();
     }
 

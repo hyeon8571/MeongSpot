@@ -25,7 +25,11 @@ public class WalkingRedisRepository {
 
     public Long getStartTime(Long userId) {
         String key = "walking:" + userId + ":startTime";
-        return (Long) redisTemplate.opsForValue().get(key);
+        Object value = redisTemplate.opsForValue().get(key);
+        if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        }
+        return (Long) value;
     }
 
     public List<Object> getGpsData(Long userId) {
