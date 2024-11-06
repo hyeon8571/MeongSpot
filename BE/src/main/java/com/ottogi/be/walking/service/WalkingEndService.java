@@ -11,6 +11,7 @@ import com.ottogi.be.member.repository.MemberRepository;
 import com.ottogi.be.walking.domain.WalkingLog;
 import com.ottogi.be.walking.repository.WalkingLogRepository;
 import com.ottogi.be.walking.repository.WalkingRedisRepository;
+import com.ottogi.be.walking.util.PolylineUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +36,8 @@ public class WalkingEndService {
     @Transactional
     public void endWalking(String loginId) throws JsonProcessingException {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(MemberNotFoundException::new);
-
         Long userId = member.getId();
+
 
         List<Object> gpsCoordinates = walkingRedisRepository.getGpsData(userId);
         List<PointDto> latLngList = parseGpsCoordinates(gpsCoordinates);
@@ -53,11 +55,12 @@ public class WalkingEndService {
                 .toLocalDateTime();
 
         double distance = calculateDistance(latLngList);
-        String trail = encodePolyline(latLngList);
+        String trail = PolylineUtils.encodePolyline(latLngList.stream()
+                .map(dto -> new PointDto(dto.getLat(), dto.getLng()))
+                .collect(Collectors.toList()));
 
 
         for (Long dogId : parsedDogIds) {
-            System.out.println(dogId);
             Dog dog = dogRepository.findById(dogId).orElseThrow(DogNotFoundException::new);
 
             WalkingLog walkingLog = WalkingLog.builder()
@@ -74,49 +77,18 @@ public class WalkingEndService {
         walkingRedisRepository.deleteWalkingData(userId);
     }
 
-    private String encodePolyline(List<PointDto> latLngList){
-        StringBuilder encoded = new StringBuilder();
-        int prevLat = 0, prevLng = 0;
-
-        for (PointDto point : latLngList) {
-            int lat = (int) (point.getLat() * 1E6);
-            int lng = (int) (point.getLng() * 1E6);
-
-            int latDiff = lat - prevLat;
-            encoded.append(encodeCoordinate(latDiff));
-            int lngDiff = lng - prevLng;
-            encoded.append(encodeCoordinate(lngDiff));
-
-            prevLat = lat;
-            prevLng = lng;
-        }
-
-        return encoded.toString();
-    }
-
     private List<PointDto> parseGpsCoordinates(List<Object> gpsCoordinates){
         List<PointDto> latLngList = new ArrayList<>();
 
         for (Object obj : gpsCoordinates) {
-            String coordStr = obj.toString().replace("\"", ""); // 따옴표 제거
-            String[] parts = coordStr.split(","); // 쉼표로 나누기
+            String coordStr = obj.toString().replace("\"", "");
+            String[] parts = coordStr.split(",");
             double lat = Double.parseDouble(parts[0]);
             double lng = Double.parseDouble(parts[1]);
             latLngList.add(new PointDto(lat, lng));
         }
 
         return latLngList;
-    }
-
-    private String encodeCoordinate(int value) {
-        value = value < 0 ? ~(value << 1) : (value << 1);
-        StringBuilder encoded = new StringBuilder();
-        while (value >= 0x20) {
-            encoded.append((char) ((0x20 | (value & 0x1f)) + 63));
-            value >>= 5;
-        }
-        encoded.append((char) (value + 63));
-        return encoded.toString();
     }
 
     List<Long> parseDogIds(List<Object> dogIds) throws JsonProcessingException {
