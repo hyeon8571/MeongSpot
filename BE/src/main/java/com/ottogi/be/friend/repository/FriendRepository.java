@@ -26,6 +26,33 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             FROM friend f
             WHERE f.sender_id = :memberId)
             """, nativeQuery = true)
-    List<Long> findByMemberId(@Param("memberId") Long memberId);
+    List<Long> findFriendByMemberId(@Param("memberId") Long memberId);
+
+    @Query(value = """
+        (SELECT m.id
+        FROM friend f
+        JOIN member m ON f.sender_id = m.id
+        WHERE f.receiver_id = :memberId
+          AND m.nickname LIKE %:keyword%
+        ORDER BY CASE
+        WHEN m.nickname LIKE :keyword THEN 0
+        WHEN m.nickname LIKE :keyword% THEN 1
+        WHEN m.nickname LIKE %:keyword THEN 2
+        WHEN m.nickname LIKE %:keyword% THEN 3
+        END)
+        UNION
+        (SELECT m.id
+        FROM friend f
+        JOIN member m ON f.receiver_id = m.id
+        WHERE f.sender_id = :memberId
+          AND m.nickname LIKE %:keyword%
+        ORDER BY CASE
+        WHEN m.nickname LIKE :keyword THEN 0
+        WHEN m.nickname LIKE :keyword% THEN 1
+        WHEN m.nickname LIKE %:keyword THEN 2
+        WHEN m.nickname LIKE %:keyword% THEN 3
+        END)
+        """, nativeQuery = true)
+    List<Long> findFriendsByNickname(@Param("memberId") Long memberId, @Param("keyword") String keyword);
 
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FriendDetailsDto {
-    private Long id;
+public class SearchFriendDto {
+    private String keyword;
     private String loginId;
 }

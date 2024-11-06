@@ -1,17 +1,15 @@
-package com.ottogi.be.friend.dto.response;
+package com.ottogi.be.friend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FriendListResponse {
+public class FriendDto {
     private Long id;
     private String profileImage;
     private String nickname;
-    private List<String> dogNames;
+    private String dogName;
 }
