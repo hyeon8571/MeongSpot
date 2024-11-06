@@ -32,6 +32,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.hibernate:hibernate-spatial:6.5.3.Final'
     implementation 'net.nurigo:sdk:4.2.7'
+    implementation 'com.google.maps:google-maps-services:2.2.0'
+
 
     //Querydsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

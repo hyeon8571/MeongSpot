@@ -1,9 +1,10 @@
-package com.ottogi.be.walkingLog.domain;
+package com.ottogi.be.walking.domain;
 
 import jakarta.persistence.*;
 import com.ottogi.be.dog.domain.Dog;
 import com.ottogi.be.member.domain.Member;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -40,4 +41,14 @@ public class WalkingLog {
 
     @Column(columnDefinition = "LONGTEXT",nullable = false)
     private String trail;
+
+    @Builder
+    public WalkingLog(Member member, Dog dog, LocalDateTime createdAt, LocalDateTime finishedAt, double distance, String trail) {
+        this.member = member;
+        this.dog = dog;
+        this.createdAt = createdAt;
+        this.finishedAt = finishedAt;
+        this.distance = distance;
+        this.trail = trail;
+    }
 }

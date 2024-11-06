@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/auth/login", "/members").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers("/ws/location").permitAll()
                         .requestMatchers("/auth/phone/*", "/members/check-nickname", "/members/check-phone", "/members/check-id").permitAll()
                         .anyRequest().authenticated());
         http
