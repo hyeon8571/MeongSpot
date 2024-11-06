@@ -1,4 +1,4 @@
-package com.ottogi.gps.walking.dto;
+package com.ottogi.be.walking.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

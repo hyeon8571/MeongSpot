@@ -1,13 +1,13 @@
-package com.ottogi.gps.walking.service;
+package com.ottogi.be.walking.service;
 
-import com.ottogi.gps.member.domain.Member;
-import com.ottogi.gps.member.repository.MemberRepository;
-import com.ottogi.gps.walking.dto.WalkingStartDto;
-import com.ottogi.gps.member.exception.MemberNotFoundException;
-import com.ottogi.gps.walking.repository.WalkingRedisRepository;
+import com.ottogi.be.member.domain.Member;
+import com.ottogi.be.member.repository.MemberRepository;
+import com.ottogi.be.walking.dto.WalkingStartDto;
+import com.ottogi.be.walking.repository.WalkingRedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ottogi.be.member.exception.MemberNotFoundException;
 
 import java.time.Instant;
 
@@ -26,11 +26,5 @@ public class WalkingStartService {
         walkingRedisRepository.saveStartTime(member.getId(), startTime);
         walkingRedisRepository.saveDogIds(member.getId(), dto.getDogIds());
 
-
     }
-
-
-
-
-
 }

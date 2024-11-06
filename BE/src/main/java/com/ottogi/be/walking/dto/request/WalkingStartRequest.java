@@ -1,11 +1,10 @@
-package com.ottogi.gps.walking.dto.request;
+package com.ottogi.be.walking.dto.request;
 
-import com.ottogi.gps.walking.dto.WalkingStartDto;
+import com.ottogi.be.walking.dto.WalkingStartDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
