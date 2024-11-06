@@ -50,7 +50,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false, length = 256)
+    @Column(length = 256)
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
