@@ -15,6 +15,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(walkingSessionHandler, "/gps").setAllowedOrigins("*");
+        registry.addHandler(walkingSessionHandler, "/ws/location").setAllowedOrigins("*");
     }
 }
