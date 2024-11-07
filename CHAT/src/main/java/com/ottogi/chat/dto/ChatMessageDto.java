@@ -1,18 +1,15 @@
-package com.ottogi.be.chat.dto;
+package com.ottogi.chat.dto;
 
-import com.ottogi.be.chat.domain.ChatMessage;
-import com.ottogi.be.chat.domain.enums.MessageType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.ottogi.chat.domain.enums.MessageType;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class ChatMessageDto {
     private Long senderId;
     private String message;
