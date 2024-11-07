@@ -14,6 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class WalkingLogResponse {
-    private List<MonthlyWalkingLogDto> monthlyStats;
-    private List<WalkingLogDto> recentWalks;
+    private List<MonthlyWalkingLogDto> monthlyWalkingLogs;
+    private List<WalkingLogDto> recentWalkingLogs;
 }
