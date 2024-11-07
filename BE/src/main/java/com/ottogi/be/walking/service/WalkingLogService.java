@@ -34,7 +34,7 @@ public class WalkingLogService {
     public WalkingLogResponse findWalkingLog(String loginId){
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(MemberNotFoundException::new);
         LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        System.out.println(startOfMonth);
+
         List<MonthlyWalkingLogDto> monthlyLogs = walkingLogRepository.findMonthlyStatsForMember(member.getId(), startOfMonth);
         List<WalkingLogDto> recentWalks = walkingLogRepository.findRecentWalksForMember(member.getId());
 

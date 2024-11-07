@@ -3,7 +3,6 @@ package com.ottogi.be.walking.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
-import com.ottogi.be.dog.dto.response.FindFriendDogResponse;
 import com.ottogi.be.walking.dto.request.WalkingStartRequest;
 import com.ottogi.be.walking.dto.response.WalkingLogDetailResponse;
 import com.ottogi.be.walking.dto.response.WalkingLogResponse;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/walking-log")
