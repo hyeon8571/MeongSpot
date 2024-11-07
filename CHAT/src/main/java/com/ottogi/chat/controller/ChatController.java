@@ -18,6 +18,8 @@ public class ChatController {
     private final RabbitTemplate rabbitTemplate;
     private final SendMessageService sendMessageService;
 
+    private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
+
     @MessageMapping("chat.enter.{chatRoomId}")
     public void enterChatRoom(@DestinationVariable Long chatRoomId) {
 
@@ -25,7 +27,7 @@ public class ChatController {
 
     @MessageMapping("chat.message.{chatRoomId}")
     public void messageSend(@Payload SendMessageRequest request, @DestinationVariable Long chatRoomId) {
-        ChatMessageDto message = sendMessageService.sendMessage(request);
-
+        ChatMessageDto message = sendMessageService.sendMessage(request, chatRoomId);
+        rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, message);
     }
 }
