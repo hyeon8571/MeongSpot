@@ -1,17 +1,21 @@
 package com.ottogi.be.walking.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class WalkingLogDto {
     private Long walkingLogId;
-    private String date;
+    private LocalDateTime date;
     private String dogImage;
     private String dogName;
-    private int totalWalkingTime;
-    private double distance;
+    private Integer time;
+    private Double distance;
 }
