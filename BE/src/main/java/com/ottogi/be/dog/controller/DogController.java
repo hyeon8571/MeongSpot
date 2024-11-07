@@ -4,7 +4,8 @@ import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.dog.dto.request.DogAddRequest;
 import com.ottogi.be.dog.dto.request.DogModifyRequest;
-import com.ottogi.be.dog.dto.response.DogListResponse;
+import com.ottogi.be.dog.dto.response.FindMemberDogResponse;
+import com.ottogi.be.dog.dto.response.FindMyDogResponse;
 import com.ottogi.be.dog.dto.response.PersonalityResponse;
 import com.ottogi.be.dog.service.BreedService;
 import com.ottogi.be.dog.service.DogService;
@@ -56,9 +57,15 @@ public class DogController {
     }
 
     @GetMapping
-    public ResponseEntity<?> dogList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        List<DogListResponse> result = dogService.findDogList(loginMemberInfo.getLoginId());
-        return ResponseEntity.ok(new ApiResponse<>("DO104", "반려견 목록 조회 성공", result));
+    public ResponseEntity<?> myDogList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        List<FindMyDogResponse> result = dogService.findMyDogList(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("DO104", "내 반려견 목록 조회 성공", result));
+    }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<?> memberDogList(@PathVariable Long memberId) {
+        List<FindMemberDogResponse> result = dogService.findMemberDogList(memberId);
+        return ResponseEntity.ok(new ApiResponse<>("DO106", "사용자 반려견 목록 조회 성공", result));
     }
 
     @PutMapping("/{dogId}")
