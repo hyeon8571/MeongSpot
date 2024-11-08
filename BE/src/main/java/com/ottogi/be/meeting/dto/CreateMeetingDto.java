@@ -23,7 +23,7 @@ public class CreateMeetingDto {
     private String title;
     private LocalDate date;
     private int hour;
-    private int min;
+    private int minute;
     private String detailLocation;
     private List<String> hashtag;
     private int maxParticipants;
@@ -36,7 +36,7 @@ public class CreateMeetingDto {
                 .title(request.getTitle())
                 .date(request.getDate())
                 .hour(request.getHour())
-                .min(request.getMin())
+                .minute(request.getMinute())
                 .detailLocation(request.getDetailLocation())
                 .hashtag(request.getHashtag())
                 .maxParticipants(request.getMaxParticipants())

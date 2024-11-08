@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum MeetingExceptionConstants implements ExceptionConstants {
 
-    CANNOT_CREATE_MEETING("ME000", "모임 생성 실패", HttpStatus.BAD_REQUEST);
+    INVALID_MEETING_TIME("MT000", "유효하지 않은 모임 시간", HttpStatus.BAD_REQUEST);
 
     final String code;
     final String message;

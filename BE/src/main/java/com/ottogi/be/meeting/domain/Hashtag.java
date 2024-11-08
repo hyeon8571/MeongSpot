@@ -15,7 +15,7 @@ public class Hashtag {
     @JoinColumn(name = "meeting_id")
     private Meeting meeting;
 
-    @Column(length = 8, nullable = false)
+    @Column(length = 16, nullable = false)
     private String tag;
 
     @Builder
