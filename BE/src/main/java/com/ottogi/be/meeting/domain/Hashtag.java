@@ -1,8 +1,11 @@
 package com.ottogi.be.meeting.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
 public class Hashtag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,4 +17,10 @@ public class Hashtag {
 
     @Column(length = 8, nullable = false)
     private String tag;
+
+    @Builder
+    public Hashtag(Meeting meeting, String tag) {
+        this.meeting = meeting;
+        this.tag = tag;
+    }
 }

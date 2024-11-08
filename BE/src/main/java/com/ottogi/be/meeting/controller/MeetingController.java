@@ -2,6 +2,7 @@ package com.ottogi.be.meeting.controller;
 
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
+import com.ottogi.be.meeting.dto.CreateMeetingDto;
 import com.ottogi.be.meeting.dto.request.CreateMeetingRequest;
 import com.ottogi.be.meeting.service.CreateMeetingService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/meeting")
+@RequestMapping("/meetings")
 public class MeetingController {
 
     private final CreateMeetingService createMeetingService;
@@ -20,7 +21,7 @@ public class MeetingController {
     public ResponseEntity<?> meetingAdd(@PathVariable Long spotId,
                                         @RequestBody CreateMeetingRequest createMeetingRequest,
                                         @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        createMeetingService.addMeeting();
+        createMeetingService.addMeeting(CreateMeetingDto.toDto(spotId, createMeetingRequest, loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("ME100", "모임 생성 성공", null));
     }
 

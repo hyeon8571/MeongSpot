@@ -3,12 +3,15 @@ package com.ottogi.be.meeting.domain;
 import com.ottogi.be.chat.domain.ChatRoom;
 import com.ottogi.be.spot.domain.Spot;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Meeting {
     @Id
@@ -45,5 +48,15 @@ public class Meeting {
     @PrePersist
     protected void onCreate() {
         isDone = false;
+    }
+
+    @Builder
+    public Meeting(Spot spot, ChatRoom chatRoom, String title, int maxParticipants, LocalDateTime meetingAt, String detailLocation, Boolean isDone) {
+        this.spot = spot;
+        this.chatRoom = chatRoom;
+        this.title = title;
+        this.maxParticipants = maxParticipants;
+        this.meetingAt = meetingAt;
+        this.detailLocation = detailLocation;
     }
 }
