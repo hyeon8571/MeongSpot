@@ -20,7 +20,6 @@ public class NotificationService {
     @Transactional
     public List<NotificationResponse> findNotificationList(String loginId){
         Member member = memberRepository.findByLoginId(loginId).orElseThrow(MemberNotFoundException::new);
-        //
-        return notificationRepository.findAllByReceiver(member);
+          return notificationRepository.findAllByReceiver(member);
     }
 }

@@ -31,8 +31,7 @@ public class NotificationController {
     @GetMapping
     public ResponseEntity<?> notificationListFind(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         List<NotificationResponse> notifications = notificationService.findNotificationList(loginMemberInfo.getLoginId());
-        return ResponseEntity.ok(new ApiResponse<>("NO103","알림 목록 조회 성공",notifications));
+        return ResponseEntity.ok(new ApiResponse<>("NO103", "알림 목록 조회 성공", notifications));
     }
-
 
 }
