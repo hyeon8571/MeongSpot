@@ -11,7 +11,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
-@DiscriminatorValue("NOTIFICATIONFRIENDINVITE")
 public class NotificationFriendInvite extends Notification {
 
     @Enumerated(EnumType.STRING)

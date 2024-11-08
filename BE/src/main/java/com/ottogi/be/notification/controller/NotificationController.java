@@ -3,6 +3,7 @@ package com.ottogi.be.notification.controller;
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.notification.dto.request.FCMTokenRequest;
+import com.ottogi.be.notification.dto.request.NotificationReadRequest;
 import com.ottogi.be.notification.dto.response.NotificationResponse;
 import com.ottogi.be.notification.service.FCMTokenService;
 import com.ottogi.be.notification.service.NotificationService;
@@ -33,5 +34,14 @@ public class NotificationController {
         List<NotificationResponse> notifications = notificationService.findNotificationList(loginMemberInfo.getLoginId());
         return ResponseEntity.ok(new ApiResponse<>("NO103", "알림 목록 조회 성공", notifications));
     }
+
+    @PatchMapping("/read")
+    public ResponseEntity<?> notificationRead(@RequestBody NotificationReadRequest request,
+                                              @AuthenticationPrincipal LoginMemberInfo loginMemberInfo){
+        notificationService.readNotification(request.toDto(loginMemberInfo.getLoginId()));
+        return ResponseEntity.ok(new ApiResponse<>("NO101","알림 읽기 성공",null));
+    }
+
+
 
 }

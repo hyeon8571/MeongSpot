@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE notification SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "DTYPE")
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
