@@ -1,6 +1,6 @@
 package com.ottogi.be.notification.dto.request;
 
-import com.ottogi.be.notification.dto.NotificationReadDto;
+import com.ottogi.be.notification.dto.NotificationDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 public class NotificationReadRequest {
     private Long notificationId;
 
-    public NotificationReadDto toDto(String loginId){
-        return NotificationReadDto.builder()
+    public NotificationDto toDto(String loginId){
+        return NotificationDto.builder()
                 .notificationId(this.notificationId)
                 .loginId(loginId)
                 .build();

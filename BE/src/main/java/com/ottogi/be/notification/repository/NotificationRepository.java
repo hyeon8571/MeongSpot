@@ -28,5 +28,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
             """)
     List<NotificationResponse> findAllByReceiver(@Param("member") Member member);
 
+    boolean existsByReceiverAndIsReadFalse(Member receiver);
 
 }
