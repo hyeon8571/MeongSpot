@@ -4,6 +4,7 @@ import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.dog.dto.request.DogAddRequest;
 import com.ottogi.be.dog.dto.request.DogModifyRequest;
+import com.ottogi.be.dog.dto.response.FindDogNameResponse;
 import com.ottogi.be.dog.dto.response.FindMemberDogResponse;
 import com.ottogi.be.dog.dto.response.FindMyDogResponse;
 import com.ottogi.be.dog.dto.response.PersonalityResponse;
@@ -79,8 +80,8 @@ public class DogController {
     }
 
     @GetMapping("/name")
-    public ResponseEntity<?> memberDogNameList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        List<String> result = findDogListService.findDogNameList(loginMemberInfo.getLoginId());
-        return ResponseEntity.ok(new ApiResponse<>("DO106", "모임 참여 반려견 조회 성공", result));
+    public ResponseEntity<?> myDogNameList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        List<FindDogNameResponse> result = findDogListService.findDogNameList(loginMemberInfo.getLoginId());
+        return ResponseEntity.ok(new ApiResponse<>("DO107", "모임 참여 반려견 목록 조회 성공", result));
     }
 }

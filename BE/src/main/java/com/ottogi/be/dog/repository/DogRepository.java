@@ -1,6 +1,7 @@
 package com.ottogi.be.dog.repository;
 
 import com.ottogi.be.dog.domain.Dog;
+import com.ottogi.be.dog.dto.response.FindDogNameResponse;
 import com.ottogi.be.friend.dto.FriendDto;
 import com.ottogi.be.member.domain.Member;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -13,8 +14,12 @@ public interface DogRepository extends JpaRepository<Dog, Long> {
     @Query("SELECT d FROM Dog d WHERE d.member = :member")
     List<Dog> findByMember(Member member);
 
-    @Query("SELECT d.name FROM Dog d WHERE d.member = :member")
-    List<String> findDogsNameByMember(Member member);
+    @Query("""
+            SELECT new com.ottogi.be.dog.dto.response.FindDogNameResponse(d.id, d.name)
+            FROM Dog d
+            WHERE d.member = :member
+            """)
+    List<FindDogNameResponse> findDogNameByMember(@Param("member") Member member);
 
     @Query("""
             SELECT new com.ottogi.be.friend.dto.FriendDto(
