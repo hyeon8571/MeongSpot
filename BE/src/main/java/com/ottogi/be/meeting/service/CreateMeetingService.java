@@ -1,7 +1,9 @@
 package com.ottogi.be.meeting.service;
 
+import com.ottogi.be.chat.domain.ChatMember;
 import com.ottogi.be.chat.domain.ChatRoom;
 import com.ottogi.be.chat.domain.enums.ChatRoomType;
+import com.ottogi.be.chat.repository.ChatMemberRepository;
 import com.ottogi.be.chat.repository.ChatRoomRepository;
 import com.ottogi.be.dog.domain.Dog;
 import com.ottogi.be.dog.exception.DogOwnerMismatchException;
@@ -10,7 +12,7 @@ import com.ottogi.be.meeting.domain.Hashtag;
 import com.ottogi.be.meeting.domain.Meeting;
 import com.ottogi.be.meeting.domain.MeetingMember;
 import com.ottogi.be.meeting.dto.CreateMeetingDto;
-import com.ottogi.be.meeting.exception.CannotCreateMeetingException;
+import com.ottogi.be.meeting.exception.InvalidMeetingTimeException;
 import com.ottogi.be.meeting.repository.HashTagRepository;
 import com.ottogi.be.meeting.repository.MeetingMemberRepository;
 import com.ottogi.be.meeting.repository.MeetingRepository;
@@ -40,6 +42,7 @@ public class CreateMeetingService {
     private final MeetingRepository meetingRepository;
     private final HashTagRepository hashTagRepository;
     private final MeetingMemberRepository meetingMemberRepository;
+    private final ChatMemberRepository chatMemberRepository;
 
     @Transactional
     public void addMeeting(CreateMeetingDto dto) {
@@ -48,28 +51,27 @@ public class CreateMeetingService {
         Member member = memberRepository.findByLoginId(dto.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        String title = dto.getTitle();
-        if (title == null || title.isEmpty()) throw new CannotCreateMeetingException();
-
-        LocalDate date = dto.getDate();
-        LocalDateTime meetingStartTime = date.atTime(dto.getHour(), dto.getMin());
+        LocalDate meetingDate = dto.getDate();
+        LocalDateTime meetingStartTime = meetingDate.atTime(dto.getHour(), dto.getMinute());
         LocalDateTime currentTime = LocalDateTime.now();
-        if (meetingStartTime.isBefore(currentTime)) throw new CannotCreateMeetingException();
-
-        int maxParticipants = dto.getMaxParticipants();
-        if (maxParticipants <= 1) throw new CannotCreateMeetingException();
+        if (meetingStartTime.isBefore(currentTime)) throw new InvalidMeetingTimeException();
+        if (meetingDate.isAfter(currentTime.toLocalDate().plusWeeks(2))) throw new InvalidMeetingTimeException();
 
         List<Long> dogIds = dto.getDogIds();
-        if (dogIds == null || dogIds.isEmpty()) throw new CannotCreateMeetingException();
         if (!dogRepository.isOwner(member, dogIds)) throw new DogOwnerMismatchException();
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .chatRoomType(ChatRoomType.MEETING)
                 .build();
-        ChatRoom chat = chatRoomRepository.save(chatRoom);
+        ChatRoom chat = chatRoomRepository.saveAndFlush(chatRoom);
+        ChatMember chatMember = ChatMember.builder()
+                .chatRoom(chat)
+                .member(member)
+                .build();
+        chatMemberRepository.save(chatMember);
 
-        Meeting meeting = dto.toEntity(meetingSpot, chat, meetingStartTime);
-        meetingRepository.save(meeting);
+        Meeting meetingEntity = dto.toEntity(meetingSpot, chat, meetingStartTime);
+        Meeting meeting = meetingRepository.saveAndFlush(meetingEntity);
 
         List<String> hashtag = dto.getHashtag();
         if (hashtag != null && !hashtag.isEmpty()) {
