@@ -78,7 +78,7 @@ public class MemberController {
     }
 
     @PatchMapping("/nickname")
-    ResponseEntity<?> nicknameModify(@RequestBody ModifyNicknameRequest request,
+    ResponseEntity<?> nicknameModify(@Valid @RequestBody ModifyNicknameRequest request,
                                      @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
 
         modifyNicknameService.modifyNickname(request.toDto(loginMemberInfo.getLoginId()));
