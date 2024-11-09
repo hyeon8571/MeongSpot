@@ -45,7 +45,10 @@ public class InviteFriendService {
         Member receiver = memberRepository.findById(request.getReceiverId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        if (friendRepository.existsBySenderAndReceiver(member, receiver)) {throw new AlreadyFriendException();}
+        if (friendRepository.existsBySenderAndReceiver(member, receiver) ||
+                friendRepository.existsBySenderAndReceiver(receiver, member)) {
+            throw new AlreadyFriendException();
+        }
         if (notificationFriendInviteRepository.existsBySenderAndReceiverAndStatus(member, receiver, Status.WAIT)) {throw new AlreadyInvitationException();}
 
         NotificationFriendInvite notification = NotificationFriendInvite.builder()
