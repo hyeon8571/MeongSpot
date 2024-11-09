@@ -1,7 +1,7 @@
-package com.ottogi.be.member.domain;
+package com.ottogi.chat.domain;
 
-import com.ottogi.be.member.domain.enums.Gender;
-import com.ottogi.be.member.domain.enums.Role;
+import com.ottogi.chat.domain.enums.Gender;
+import com.ottogi.chat.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -64,14 +64,6 @@ public class Member {
     private Boolean isWithdraw;
 
     private LocalDateTime withdrawnAt;
-
-    public void updateProfileImage(String profileImage) {
-        this.profileImage = profileImage;
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
     @Builder
     public Member(String loginId, String password, String name, String nickname, String phone, LocalDate birth, Gender gender) {
