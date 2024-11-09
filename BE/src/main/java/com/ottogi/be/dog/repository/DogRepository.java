@@ -32,9 +32,9 @@ public interface DogRepository extends JpaRepository<Dog, Long> {
     List<FriendDto> findAllByMemberId(@Param("memberIds") List<Long> memberIds);
 
     @Query("""
-            SELECT COUNT(d) = 0
+            SELECT COUNT(d) = :dogCount
             FROM Dog d
-            WHERE d.id IN :dogIds AND d.member != :member
+            WHERE d.id IN :dogIds AND d.member = :member
             """)
-    Boolean isOwner(@Param("member") Member member, @Param("dogIds") List<Long> dogIds);
+    Boolean isOwner(@Param("member") Member member, @Param("dogIds") List<Long> dogIds, @Param("dogCount") int dogCount);
 }
