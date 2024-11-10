@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface MeetingMemberRepository extends JpaRepository<MeetingMember, Long> {
-    @Query("SELECT DISTINCT COUNT(*) FROM MeetingMember mm WHERE mm.meeting = :meeting")
+    @Query("SELECT COUNT(DISTINCT mm.member) FROM MeetingMember mm WHERE mm.meeting = :meeting")
     int countMembersByMeeting(@Param("meeting") Meeting meeting);
 
     @Query("""
