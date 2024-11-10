@@ -1,4 +1,4 @@
-package com.ottogi.be.chat.dto;
+package com.ottogi.be.notification.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateFriendChatRoomDto {
-    private Long friendId;
+public class FriendInviteNotificationDto {
+    private Long notificationId;
+    private Boolean accept;
     private String loginId;
 }

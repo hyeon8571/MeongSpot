@@ -3,10 +3,12 @@ package com.ottogi.be.chat.service;
 import com.ottogi.be.chat.domain.ChatMember;
 import com.ottogi.be.chat.domain.ChatMessage;
 import com.ottogi.be.chat.domain.ChatRoom;
+import com.ottogi.be.chat.domain.enums.ChatRoomType;
 import com.ottogi.be.chat.dto.ChatMessageDto;
 import com.ottogi.be.chat.dto.FindChatRoomDto;
 import com.ottogi.be.chat.dto.response.FindChatRoomResponse;
-import com.ottogi.be.chat.dto.response.FriendChatRoomResponse;
+import com.ottogi.be.chat.dto.response.ChatRoomResponse;
+import com.ottogi.be.chat.event.EnterMeetingChatRoomEvent;
 import com.ottogi.be.chat.exception.ChatRoomNotFoundException;
 import com.ottogi.be.chat.repository.ChatMemberRepository;
 import com.ottogi.be.chat.repository.ChatMessageRepository;
@@ -15,6 +17,7 @@ import com.ottogi.be.member.domain.Member;
 import com.ottogi.be.member.exception.MemberNotFoundException;
 import com.ottogi.be.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
@@ -36,21 +39,22 @@ public class FindChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
-    public List<FriendChatRoomResponse> findFriendChatRoomList(String loginId) {
-        List<ChatMember> myFriendInfos = chatMemberRepository.findAllChatFriendByLoginId(loginId);
-        List<ChatMember> myFriendChatList = chatMemberRepository.findAllFriendChatByLoginId(loginId);
+    public List<ChatRoomResponse> findChatRoomList(String loginId) {
+        List<ChatMember> myInterlocutorInfos = chatMemberRepository.findAllInterlocutorByLoginId(loginId);
+        List<ChatMember> myPersonalChatList = chatMemberRepository.findAllPersonalChatByLoginId(loginId);
 
-        List<FriendChatRoomResponse> result= new ArrayList<>();
+        List<ChatRoomResponse> result= new ArrayList<>();
 
-        for (int i = 0; i < myFriendInfos.size(); i++) {
-            ChatMember chatMember = myFriendInfos.get(i);
+        for (int i = 0; i < myInterlocutorInfos.size(); i++) {
+            ChatMember chatMember = myInterlocutorInfos.get(i);
             Long chatRoomId = chatMember.getChatRoom().getId();
             ChatMessage lastMessage = chatMessageRepository.findFirstByChatRoomIdOrderBySentAtDesc(chatRoomId);
 
-            LocalDateTime leftAt = myFriendChatList.get(i).getLeftAt();
-            LocalDateTime readAt = myFriendChatList.get(i).getReadAt();
+            LocalDateTime leftAt = myPersonalChatList.get(i).getLeftAt();
+            LocalDateTime readAt = myPersonalChatList.get(i).getReadAt();
 
             long unreadMessageCnt = 0;
 
@@ -62,10 +66,10 @@ public class FindChatRoomService {
 
 
             if (lastMessage != null && (leftAt == null || lastMessage.getSentAt().isAfter(leftAt))) {
-                FriendChatRoomResponse response = FriendChatRoomResponse.builder()
+                ChatRoomResponse response = ChatRoomResponse.builder()
                         .chatRoomId(chatRoomId)
-                        .friend(chatMember.getMember().getNickname())
-                        .friendProfileImage(chatMember.getMember().getProfileImage())
+                        .interlocutorNickname(chatMember.getMember().getNickname())
+                        .interlocutorProfileImage(chatMember.getMember().getProfileImage())
                         .lastMessage(lastMessage.getMessage())
                         .lastMessageSentAt(lastMessage.getSentAt())
                         .unreadMessageCnt(unreadMessageCnt)
@@ -73,7 +77,8 @@ public class FindChatRoomService {
                 result.add(response);
             }
         }
-        result.sort(Comparator.comparing(FriendChatRoomResponse::getLastMessageSentAt).reversed());
+
+        result.sort(Comparator.comparing(ChatRoomResponse::getLastMessageSentAt).reversed());
 
        return result;
     }
@@ -88,6 +93,10 @@ public class FindChatRoomService {
 
         ChatMember chatMember = chatMemberRepository.findByChatRoomIdAndMyId(chatRoom.getId(), member.getId())
                 .orElseThrow(ChatRoomNotFoundException::new);
+
+        if (chatRoom.getChatRoomType() == ChatRoomType.MEETING && chatMember.getReadAt() == null) {
+            eventPublisher.publishEvent(new EnterMeetingChatRoomEvent(chatRoom.getId(), member.getNickname()));
+        }
 
         chatMember.updateReadAt();
 
