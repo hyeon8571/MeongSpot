@@ -2,11 +2,10 @@ package com.ottogi.be.dog.controller;
 
 import com.ottogi.be.auth.dto.LoginMemberInfo;
 import com.ottogi.be.common.dto.response.ApiResponse;
+import com.ottogi.be.dog.dto.MeetingDogDto;
 import com.ottogi.be.dog.dto.request.DogAddRequest;
 import com.ottogi.be.dog.dto.request.DogModifyRequest;
-import com.ottogi.be.dog.dto.response.FindMemberDogResponse;
-import com.ottogi.be.dog.dto.response.FindMyDogResponse;
-import com.ottogi.be.dog.dto.response.PersonalityResponse;
+import com.ottogi.be.dog.dto.response.*;
 import com.ottogi.be.dog.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +77,7 @@ public class DogController {
 
     @GetMapping("/name")
     public ResponseEntity<?> myDogNameList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
-        List<String> result = findDogListService.findDogNameList(loginMemberInfo.getLoginId());
+        List<FindDogNameResponse> result = findDogListService.findDogNameList(loginMemberInfo.getLoginId());
         return ResponseEntity.ok(new ApiResponse<>("DO107", "나의 반려견 이름 목록 조회 성공", result));
     }
 
@@ -86,6 +85,13 @@ public class DogController {
     public ResponseEntity<?> meetingDogProfileImageList(@RequestParam Long meetingId) {
         List<String> result = findMeetingDogService.findMeetingDogImageList(meetingId);
         return ResponseEntity.ok(new ApiResponse<>("DO108", "모임 참여 반려견 이미지 목록 조회 성공", result));
+    }
+
+    @GetMapping("/meeting")
+    public ResponseEntity<?> meetingDogList(@RequestParam Long meetingId,
+                                            @RequestParam Long memberId) {
+        List<FindMeetingDogResponse> result = findMeetingDogService.findMeetingDogList(new MeetingDogDto(meetingId, memberId));
+        return ResponseEntity.ok(new ApiResponse<>("DO109", "모임 참여 반려견 목록 조회 성공", result));
     }
 
 }
