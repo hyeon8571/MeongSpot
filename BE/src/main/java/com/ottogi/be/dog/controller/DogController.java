@@ -7,10 +7,7 @@ import com.ottogi.be.dog.dto.request.DogModifyRequest;
 import com.ottogi.be.dog.dto.response.FindMemberDogResponse;
 import com.ottogi.be.dog.dto.response.FindMyDogResponse;
 import com.ottogi.be.dog.dto.response.PersonalityResponse;
-import com.ottogi.be.dog.service.BreedService;
-import com.ottogi.be.dog.service.DogService;
-import com.ottogi.be.dog.service.FindDogListService;
-import com.ottogi.be.dog.service.PersonalityService;
+import com.ottogi.be.dog.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,6 +29,7 @@ public class DogController {
     private final PersonalityService personalityService;
     private final DogService dogService;
     private final FindDogListService findDogListService;
+    private final FindMeetingDogService findMeetingDogService;
 
     @GetMapping("/breed")
     public ResponseEntity<?> breedList() {
@@ -79,8 +77,15 @@ public class DogController {
     }
 
     @GetMapping("/name")
-    public ResponseEntity<?> memberDogNameList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+    public ResponseEntity<?> myDogNameList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         List<String> result = findDogListService.findDogNameList(loginMemberInfo.getLoginId());
-        return ResponseEntity.ok(new ApiResponse<>("DO106", "모임 참여 반려견 조회 성공", result));
+        return ResponseEntity.ok(new ApiResponse<>("DO107", "나의 반려견 이름 목록 조회 성공", result));
     }
+
+    @GetMapping("/meeting/profileImage")
+    public ResponseEntity<?> meetingDogProfileImageList(@RequestParam Long meetingId) {
+        List<String> result = findMeetingDogService.findMeetingDogImageList(meetingId);
+        return ResponseEntity.ok(new ApiResponse<>("DO108", "모임 참여 반려견 이미지 목록 조회 성공", result));
+    }
+
 }
