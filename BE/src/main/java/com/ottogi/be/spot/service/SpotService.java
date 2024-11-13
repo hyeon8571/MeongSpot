@@ -1,5 +1,6 @@
 package com.ottogi.be.spot.service;
 
+import com.ottogi.be.meeting.repository.MeetingRepository;
 import com.ottogi.be.spot.domain.Spot;
 import com.ottogi.be.spot.dto.SpotDto;
 import com.ottogi.be.spot.dto.response.SpotResponse;
@@ -15,20 +16,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SpotService {
     private final SpotRepository spotRepository;
+    private final MeetingRepository meetingRepository;
 
     @Transactional
     public List<SpotResponse> findWalkingSpots(SpotDto dto){
         List<Spot> spots = spotRepository.findParksWithinRadius(dto.getLat(),dto.getLng(),dto.getRadius());
-        //meetingcount조회 to-do
 
         return spots.stream()
-                .map(spot -> SpotResponse.builder()
-                        .meetingCnt(1)
-                        .spotId(spot.getId())
-                        .lat(spot.getLat())
-                        .lng(spot.getLng())
-                        .name(spot.getName())
-                        .build())
+                .map(spot -> {
+                    long meetingCnt = spotRepository.countMeetingsBySpotAndIsNotDone(spot);
+                    return SpotResponse.builder()
+                            .meetingCnt((int) meetingCnt)
+                            .spotId(spot.getId())
+                            .lat(spot.getLat())
+                            .lng(spot.getLng())
+                            .name(spot.getName())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 }

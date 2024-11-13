@@ -1,10 +1,11 @@
 package com.ottogi.be.spot.domain;
 
+import com.ottogi.be.spot.util.PointConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import org.locationtech.jts.geom.Point;
 import java.math.BigDecimal;
 
 @Entity
@@ -25,4 +26,8 @@ public class Spot {
 
     @Column(nullable = false, length = 32)
     private String name;
+
+    @Column(nullable = false, columnDefinition = "POINT")
+//    @Convert(converter = PointConverter.class)
+    private Point location;
 }
