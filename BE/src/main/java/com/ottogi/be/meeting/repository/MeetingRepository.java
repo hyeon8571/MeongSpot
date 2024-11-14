@@ -15,4 +15,6 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     @Query("SELECT m.chatRoom.id FROM Meeting m WHERE m.id IN :meetingIds")
     List<Long> findChatRoomIdByIds(List<Long> meetingIds);
+
+    long countBySpot(Spot spot);
 }
