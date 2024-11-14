@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,18 +22,22 @@ public class SpotService {
     @Transactional
     public List<SpotResponse> findWalkingSpots(SpotDto dto){
         List<Spot> spots = spotRepository.findParksWithinRadius(dto.getLat(),dto.getLng(),dto.getRadius());
+        List<Long> spotIds = spots.stream().map(Spot::getId).collect(Collectors.toList());
+        Map<Long, Long> meetingCounts = spotRepository.countMeetingsBySpotsAndIsNotDone(spotIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        result -> result.getSpotId(),
+                        result -> result.getMeetingCount()
+                ));
 
         return spots.stream()
-                .map(spot -> {
-                    long meetingCnt = spotRepository.countMeetingsBySpotAndIsNotDone(spot);
-                    return SpotResponse.builder()
-                            .meetingCnt((int) meetingCnt)
-                            .spotId(spot.getId())
-                            .lat(spot.getLat())
-                            .lng(spot.getLng())
-                            .name(spot.getName())
-                            .build();
-                })
+                .map(spot -> SpotResponse.builder()
+                        .meetingCnt(meetingCounts.getOrDefault(spot.getId(), 0L).intValue())
+                        .spotId(spot.getId())
+                        .lat(spot.getLat())
+                        .lng(spot.getLng())
+                        .name(spot.getName())
+                        .build())
                 .collect(Collectors.toList());
     }
 }

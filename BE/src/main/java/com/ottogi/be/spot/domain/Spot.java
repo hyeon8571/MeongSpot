@@ -1,6 +1,5 @@
 package com.ottogi.be.spot.domain;
 
-import com.ottogi.be.spot.util.PointConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +27,5 @@ public class Spot {
     private String name;
 
     @Column(nullable = false, columnDefinition = "POINT")
-//    @Convert(converter = PointConverter.class)
     private Point location;
 }
