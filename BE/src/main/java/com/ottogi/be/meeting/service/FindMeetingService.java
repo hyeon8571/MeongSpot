@@ -97,11 +97,15 @@ public class FindMeetingService {
     }
 
     @Transactional(readOnly = true)
-    public FindMeetingResponse findMeeting(Long meetingId) {
-        Meeting meeting = meetingRepository.findById(meetingId)
+    public FindMeetingResponse findMeeting(FindMeetingDto dto) {
+        Member member = memberRepository.findByLoginId(dto.getLoginId())
+                .orElseThrow(MemberNotFoundException::new);
+        Meeting meeting = meetingRepository.findById(dto.getMeetingId())
                 .orElseThrow(MeetingNotFoundException::new);
 
-        return FindMeetingResponse.from(meeting);
+        Boolean isParticipate = meetingMemberRepository.existsByMemberAndMeeting(member, meeting);
+
+        return FindMeetingResponse.of(meeting, isParticipate);
     }
 
     @Transactional

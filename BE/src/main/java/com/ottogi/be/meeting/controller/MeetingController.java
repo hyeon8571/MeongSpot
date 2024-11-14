@@ -5,6 +5,7 @@ import com.ottogi.be.common.dto.response.ApiResponse;
 import com.ottogi.be.meeting.dto.*;
 import com.ottogi.be.meeting.dto.request.CreateMeetingRequest;
 import com.ottogi.be.meeting.dto.request.JoinMeetingRequest;
+import com.ottogi.be.meeting.dto.request.ModifyMeetingDogRequest;
 import com.ottogi.be.meeting.dto.response.FindMeetingResponse;
 import com.ottogi.be.meeting.dto.response.FindMyMeetingResponse;
 import com.ottogi.be.meeting.dto.response.MeetingResponse;
@@ -29,6 +30,7 @@ public class MeetingController {
     private final FindMeetingService findMeetingService;
     private final FindHashtagService findHashtagService;
     private final LeaveMeetingService leaveMeetingService;
+    private final ModifyMeetingDogService modifyMeetingDogService;
 
     @PostMapping
     public ResponseEntity<?> meetingAdd(@Valid @RequestBody CreateMeetingRequest createMeetingRequest,
@@ -39,9 +41,9 @@ public class MeetingController {
 
     @PostMapping("/{meetingId}")
     public ResponseEntity<?> meetingJoin(@PathVariable Long meetingId,
-                                         @Valid @RequestBody JoinMeetingRequest joinMeetingRequest,
+                                         @Valid @RequestBody JoinMeetingRequest request,
                                          @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) throws ExecutionException, InterruptedException {
-        joinMeetingService.joinMeeting(JoinMeetingDto.toDto(meetingId, joinMeetingRequest, loginMemberInfo.getLoginId()));
+        joinMeetingService.joinMeeting(request.toDto(meetingId, loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("MT101", "모임 참여 성공", null));
     }
 
@@ -59,8 +61,9 @@ public class MeetingController {
     }
 
     @GetMapping("/{meetingId}/info")
-    public ResponseEntity<?> meetingDetails(@PathVariable Long meetingId) {
-        FindMeetingResponse result = findMeetingService.findMeeting(meetingId);
+    public ResponseEntity<?> meetingDetails(@PathVariable Long meetingId,
+                                            @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        FindMeetingResponse result = findMeetingService.findMeeting(new FindMeetingDto(meetingId, loginMemberInfo.getLoginId()));
         return ResponseEntity.ok(new ApiResponse<>("MT104", "모임 상세 정보 조회 성공", result));
     }
 
@@ -81,6 +84,13 @@ public class MeetingController {
     public ResponseEntity<?> myMeetingList(@AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         List<FindMyMeetingResponse> result = findMeetingService.findMyMeetingList(loginMemberInfo.getLoginId());
         return ResponseEntity.ok(new ApiResponse<>("MT107", "나의 모임 목록 조회 성공", result));
+    }
+
+    @PutMapping("/dog")
+    public ResponseEntity<?> meetingDogModify(@Valid @RequestBody ModifyMeetingDogRequest request,
+                                              @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
+        modifyMeetingDogService.modifyMeetingDog(request.toDto(loginMemberInfo.getLoginId()));
+        return ResponseEntity.ok(new ApiResponse<>("MT107", "모임 참여 반려견 변경", null));
     }
 
 }
