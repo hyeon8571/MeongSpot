@@ -50,7 +50,11 @@ public interface MeetingMemberRepository extends JpaRepository<MeetingMember, Lo
 
     boolean existsByDogId(Long dogId);
 
-    @Query(value = "SELECT mm FROM MeetingMember mm JOIN FETCH mm.dog JOIN FETCH mm.meeting JOIN FETCH mm.meeting.spot WHERE mm.member.id = :memberId ORDER BY mm.meeting.meetingAt ASC")
-    List<MeetingMember> findAllByMemberId(Long memberId);
+    @Query("""
+            SELECT DISTINCT (mm.meeting.id)
+            FROM MeetingMember mm
+            WHERE mm.member.id = :memberId
+            """)
+    List<Long> findMeetingIdsByMemberId(Long memberId);
 
 }

@@ -17,8 +17,7 @@ public class FindMyMeetingResponse {
     private int maxParticipants;
     private LocalDateTime meetingAt;
     private String spotName;
-    private List<String> dogs;
     private List<String> hashtag;
     private Long chatRoomId;
-    private Boolean isNewChat;
+    private long unreadMessageCnt;
 }

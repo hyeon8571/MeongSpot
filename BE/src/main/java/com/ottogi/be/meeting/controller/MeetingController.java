@@ -90,7 +90,7 @@ public class MeetingController {
     public ResponseEntity<?> meetingDogModify(@Valid @RequestBody ModifyMeetingDogRequest request,
                                               @AuthenticationPrincipal LoginMemberInfo loginMemberInfo) {
         modifyMeetingDogService.modifyMeetingDog(request.toDto(loginMemberInfo.getLoginId()));
-        return ResponseEntity.ok(new ApiResponse<>("MT107", "모임 참여 반려견 변경", null));
+        return ResponseEntity.ok(new ApiResponse<>("MT108", "모임 참여 반려견 변경", null));
     }
 
 }

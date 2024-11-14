@@ -1,8 +1,10 @@
 package com.ottogi.be.meeting.service;
 
-import com.ottogi.be.chat.repository.ChatRoomRepository;
+import com.ottogi.be.chat.domain.ChatMember;
+import com.ottogi.be.chat.exception.ChatRoomNotFoundException;
+import com.ottogi.be.chat.repository.ChatMemberRepository;
+import com.ottogi.be.chat.service.FindChatRoomService;
 import com.ottogi.be.meeting.domain.Meeting;
-import com.ottogi.be.meeting.domain.MeetingMember;
 import com.ottogi.be.meeting.dto.*;
 import com.ottogi.be.meeting.dto.response.FindMeetingResponse;
 import com.ottogi.be.meeting.dto.response.FindMyMeetingResponse;
@@ -35,7 +37,8 @@ public class FindMeetingService {
     private final HashTagRepository hashTagRepository;
     private final MeetingMemberRepository meetingMemberRepository;
     private final MemberRepository memberRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final FindChatRoomService findChatRoomService;
+    private final ChatMemberRepository chatMemberRepository;
 
     @Transactional(readOnly = true)
     public List<MeetingResponse> findMeetingList(MeetingDto meetingDto) {
@@ -118,42 +121,40 @@ public class FindMeetingService {
         Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        List<MeetingMember> meetingMemberList = meetingMemberRepository.findAllByMemberId(member.getId());
+        List<Long> meetingMemberIdList = meetingMemberRepository.findMeetingIdsByMemberId(member.getId());
 
-        List<Long> meetingIds = meetingMemberList.stream()
-                .map(meetingMember -> meetingMember.getMeeting().getId())
-                .distinct()
-                .toList();
+        List<FindMyMeetingResponse> result = new ArrayList<>();
+        for (Long meetingId : meetingMemberIdList) {
+            Meeting meeting = meetingRepository.findById(meetingId)
+                    .orElseThrow(MeetingNotFoundException::new);
 
-        Map<Long, List<String>> dogNamesMap = meetingMemberList.stream()
-                .collect(Collectors.groupingBy(
-                        meetingMember -> meetingMember.getMeeting().getId(),
-                        Collectors.mapping(meetingMember -> meetingMember.getDog().getName(), Collectors.toList())
-                ));
+            String title = meeting.getTitle();
+            int maxParticipants = meeting.getMaxParticipants();
+            LocalDateTime meetingAt = meeting.getMeetingAt();
+            int participants = meeting.getParticipants();
+            String spot = meeting.getSpot().getName();
+            List<String> hashtag = hashTagRepository.findTagsByMeeting(meeting);
+            Long chatRoomId = meeting.getChatRoom().getId();
 
-        List<Long> chatRoomIdList = meetingRepository.findChatRoomIdByIds(meetingIds);
+            ChatMember chatMember = chatMemberRepository.findByChatRoomIdAndMyId(chatRoomId, member.getId())
+                    .orElseThrow(ChatRoomNotFoundException::new);
 
-        List<MeetingHashtagDto> hashtags = hashTagRepository.findAllByMeetingIds(meetingIds);
-        Map<Long, List<String>> hashtagMap = hashtags.stream()
-                .collect(Collectors.groupingBy(MeetingHashtagDto::getMeetingId, Collectors.mapping(MeetingHashtagDto::getHashtag, Collectors.toList())));
+            long unreadMessageCnt = findChatRoomService.countUnreadMessage(chatRoomId, chatMember.getReadAt());
 
-        List<FindMyMeetingResponse> myMeetingResponses = meetingMemberList.stream()
-                .map(MeetingMember::getMeeting)
-                .distinct()
-                .map(meeting -> FindMyMeetingResponse.builder()
-                        .meetingId(meeting.getId())
-                        .title(meeting.getTitle())
-                        .participants(meeting.getParticipants())
-                        .maxParticipants(meeting.getMaxParticipants())
-                        .meetingAt(meeting.getMeetingAt())
-                        .spotName(meeting.getSpot().getName())
-                        .dogs(dogNamesMap.get(meeting.getId()))
-                        .hashtag(hashtagMap.getOrDefault(meeting.getId(), Collections.emptyList()))
-                        .chatRoomId(meeting.getChatRoom().getId())
-                        .build()
-                )
-                .toList();
+            FindMyMeetingResponse response = FindMyMeetingResponse.builder()
+                    .meetingId(meeting.getId())
+                    .title(title)
+                    .maxParticipants(maxParticipants)
+                    .meetingAt(meetingAt)
+                    .unreadMessageCnt(unreadMessageCnt)
+                    .chatRoomId(chatRoomId)
+                    .hashtag(hashtag)
+                    .spotName(spot)
+                    .participants(participants)
+                    .build();
 
-        return myMeetingResponses;
+            result.add(response);
+        }
+        return result;
     }
 }
