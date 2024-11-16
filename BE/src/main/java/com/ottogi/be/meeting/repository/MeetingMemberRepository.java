@@ -40,6 +40,8 @@ public interface MeetingMemberRepository extends JpaRepository<MeetingMember, Lo
             """)
     List<FindMeetingMemberResponse> findMemberByMeetingId(Long meetingId);
 
+    @Modifying
+    @Query("DELETE FROM MeetingMember mm WHERE mm.member = :member AND mm.meeting = :meeting")
     void deleteAllByMemberAndMeeting(Member member, Meeting meeting);
 
     @Query("""

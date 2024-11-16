@@ -14,6 +14,8 @@ public interface HashTagRepository extends JpaRepository<Hashtag, Long> {
     @Query("SELECT h.tag FROM Hashtag h WHERE h.meeting = :meeting")
     List<String> findTagsByMeeting(Meeting meeting);
 
+    @Modifying
+    @Query("DELETE FROM Hashtag h WHERE h.meeting = :meeting")
     void deleteAllByMeeting(Meeting meeting);
 
     @Query("""

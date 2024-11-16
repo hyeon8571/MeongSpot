@@ -5,11 +5,13 @@ import com.ottogi.be.meeting.validation.annotation.Hashtag;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class CreateMeetingRequest {
     @NotNull
@@ -28,7 +30,7 @@ public class CreateMeetingRequest {
     private Integer minute;
     private String detailLocation;
     @Hashtag
-    private List<String> hashtag;
+    private List<String> hashtags;
     @NotNull
     @Min(value = 2)
     @Max(value = 10)
@@ -47,7 +49,7 @@ public class CreateMeetingRequest {
                 .hour(hour)
                 .minute(minute)
                 .detailLocation(detailLocation)
-                .hashtag(hashtag)
+                .hashtags(hashtags)
                 .maxParticipants(maxParticipants)
                 .dogIds(dogIds)
                 .information(information)
