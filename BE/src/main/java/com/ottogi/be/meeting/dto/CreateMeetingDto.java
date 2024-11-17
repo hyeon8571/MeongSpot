@@ -6,14 +6,12 @@ import com.ottogi.be.spot.domain.Spot;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CreateMeetingDto {
@@ -25,7 +23,7 @@ public class CreateMeetingDto {
     private int minute;
     private String detailLocation;
     private String information;
-    private List<String> hashtag;
+    private List<String> hashtags;
     private int maxParticipants;
     private List<Long> dogIds;
 
