@@ -36,7 +36,5 @@ public class WalkingStartService {
 
         walkingRedisRepository.saveStartTime(dto.getLoginId(), startTime);
         walkingRedisRepository.saveDogIds(dto.getLoginId(), dto.getDogIds());
-
-        sendWalkingNotificationService.sendWalkingNotification(member);
     }
 }
