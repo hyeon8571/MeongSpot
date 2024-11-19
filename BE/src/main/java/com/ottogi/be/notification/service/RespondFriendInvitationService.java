@@ -34,7 +34,7 @@ public class RespondFriendInvitationService {
     private final SendNotificationService sendNotificationService;
 
     @Transactional
-    public void respondFriendInvitation(FriendInviteNotificationDto dto) throws ExecutionException, InterruptedException {
+    public void respondFriendInvitation(FriendInviteNotificationDto dto){
         NotificationFriendInvite notificationInvite = friendInviteRepository.findById(dto.getNotificationId())
                 .orElseThrow(FriendInvitationNotFoundException::new);
 

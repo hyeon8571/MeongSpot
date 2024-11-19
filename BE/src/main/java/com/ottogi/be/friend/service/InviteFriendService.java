@@ -33,7 +33,7 @@ public class InviteFriendService {
     private final NotificationFriendInviteRepository notificationFriendInviteRepository;
 
     @Transactional
-    public void inviteFriend(FriendInvitationDto request) throws ExecutionException, InterruptedException {
+    public void inviteFriend(FriendInvitationDto request){
         Member member = memberRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(MemberNotFoundException::new);
 

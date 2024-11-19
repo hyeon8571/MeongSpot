@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 public class SendNotificationService {
 
     @Transactional
-    public void sendNotification(String targetToken, String title, String body) throws ExecutionException, InterruptedException {
+    public void sendNotification(String targetToken, String title, String body) {
         log.info("Preparing to send notification. Title: {}, Body: {}, Target Token: {}", title, body, targetToken);  // 메세지 로그
         Message message = Message.builder()
                 .setToken(targetToken)
@@ -25,11 +25,13 @@ public class SendNotificationService {
             String response = FirebaseMessaging.getInstance().sendAsync(message).get();
             log.info("Successfully sent message: {}", response);
         } catch (ExecutionException e) {
-            log.error("Failed to send message: {}", e.getMessage());
-            throw e;
+            // 에러 로그만 출력하고 애플리케이션 동작은 계속
+            log.error("Failed to send message due to execution error: {}", e.getMessage());
         } catch (InterruptedException e) {
+            // 에러 로그만 출력하고 애플리케이션 동작은 계속
             log.error("Notification sending was interrupted: {}", e.getMessage());
-            throw e;
+            // InterruptedException은 스레드 상태를 복구해야 함
+            Thread.currentThread().interrupt();
         }
     }
 }
